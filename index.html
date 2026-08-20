@@ -41,16 +41,19 @@ body{
     border-radius:50%;overflow:hidden;background:#4d5d86
 }
 .avatar svg{width:100%;height:100%;display:block}
+
 textarea{
     display:block;width:100%;height:350px;border:0;outline:0;resize:none;
     padding:48px 42px 55px 175px;background:transparent;
     color:#000;font-family:Arial,Helvetica,sans-serif;font-size:clamp(20px,3vw,34px);font-weight:600;line-height:1.4;
 }
 textarea::placeholder{color:#000;opacity:.72}
+
 .counter{
     position:absolute;right:27px;bottom:20px;color:#49451f;
     font-size:22px;font-weight:600
 }
+
 .send{
     display:block;margin:22px auto 32px;padding:16px 34px;
     min-width:320px;border:2px solid #ffbf16;border-radius:20px;
@@ -58,12 +61,26 @@ textarea::placeholder{color:#000;opacity:.72}
     cursor:pointer;box-shadow:0 7px 18px rgba(0,0,0,.35)
 }
 .send:active{transform:translateY(1px)}
+.send:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+}
+
 .status{
     display:none;max-width:700px;margin:0 auto 20px;padding:14px 18px;
     border-radius:12px;text-align:center;font-weight:800
 }
-.status.show{display:block;background:#153f28;color:#b9ffd0;border:1px solid #42cf75}
-.status.error{background:#4a1e25;color:#ffd1d7;border-color:#ff6575}
+.status.show{
+    display:block;
+    background:#153f28;
+    color:#b9ffd0;
+    border:1px solid #42cf75
+}
+.status.error{
+    background:#4a1e25;
+    color:#ffd1d7;
+    border-color:#ff6575
+}
 
 .notice{
     max-width:760px;margin:0 auto;text-align:center;
@@ -74,10 +91,30 @@ textarea::placeholder{color:#000;opacity:.72}
 @media(max-width:650px){
     body{padding:20px 9px 35px}
     .message-card{min-height:330px}
-    textarea{height:330px;padding:45px 22px 50px 120px;font-size:20px;font-weight:600;text-align:left}
-    .avatar{left:20px;transform:none;top:20px;width:88px;height:88px}
-    .counter{right:15px;bottom:13px;font-size:16px}
-    .send{min-width:0;width:92%;font-size:17px}
+    textarea{
+        height:330px;
+        padding:45px 22px 50px 120px;
+        font-size:20px;
+        font-weight:600;
+        text-align:left
+    }
+    .avatar{
+        left:20px;
+        transform:none;
+        top:20px;
+        width:88px;
+        height:88px
+    }
+    .counter{
+        right:15px;
+        bottom:13px;
+        font-size:16px
+    }
+    .send{
+        min-width:0;
+        width:92%;
+        font-size:17px
+    }
 }
 </style>
 </head>
@@ -90,10 +127,16 @@ textarea::placeholder{color:#000;opacity:.72}
         <span>DO YOU WISH OUR CELEBRANT?</span>
     </h1>
 
-    <div class="decor"><i></i><b></b><i></i></div>
+    <div class="decor">
+        <i></i>
+        <b></b>
+        <i></i>
+    </div>
 
     <form id="wishForm">
+
         <div class="message-card">
+
             <div class="avatar" aria-hidden="true">
                 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="60" cy="60" r="60" fill="#6b5f00"/>
@@ -101,13 +144,23 @@ textarea::placeholder{color:#000;opacity:.72}
                     <path d="M28 105c5-25 18-38 32-38s27 13 32 38z" fill="#ffca18"/>
                 </svg>
             </div>
-            <textarea id="wish" maxlength="500"
+
+            <textarea
+                id="wish"
+                maxlength="500"
                 placeholder="Type your birthday wish here..."
                 required></textarea>
-            <div class="counter"><span id="count">0</span> / 500</div>
+
+            <div class="counter">
+                <span id="count">0</span> / 500
+            </div>
+
         </div>
 
-        <button class="send" type="submit">✈️ &nbsp; SEND BIRTHDAY WISH</button>
+        <button class="send" type="submit">
+            ✈️ &nbsp; SEND BIRTHDAY WISH
+        </button>
+
     </form>
 
     <div id="status" class="status"></div>
@@ -116,80 +169,205 @@ textarea::placeholder{color:#000;opacity:.72}
         Your wish will be received privately by the <strong>Kulzzy Radio</strong> team.
         It will not be displayed publicly.
     </p>
+
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
 import {
-    getDatabase, ref, push, serverTimestamp
+    getDatabase,
+    ref,
+    push,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
 import {
-    getAuth, signInAnonymously
+    getAuth,
+    signInAnonymously
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
+
+/* =========================================
+   FIREBASE CONFIGURATION
+========================================= */
+
 const firebaseConfig = {
-    apiKey: "PASTE_API_KEY",
-    authDomain: "PASTE_PROJECT.firebaseapp.com",
-    databaseURL: "https://PASTE_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "PASTE_PROJECT_ID",
-    storageBucket: "PASTE_PROJECT.firebasestorage.app",
-    messagingSenderId: "PASTE_SENDER_ID",
-    appId: "PASTE_APP_ID"
+    apiKey: "AIzaSyDcdd3ZSae1Ddxmpw7pFVNwPNql0cF6C0E",
+    authDomain: "birthday-wishes-960bd.firebaseapp.com",
+    databaseURL: "https://birthday-wishes-960bd-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "birthday-wishes-960bd",
+    storageBucket: "birthday-wishes-960bd.firebasestorage.app",
+    messagingSenderId: "61276094940",
+    appId: "1:61276094940:web:5863a7d82caf1628170f19",
+    measurementId: "G-F9HZHJPXRL"
 };
 
+
+/* =========================================
+   INITIALIZE FIREBASE
+========================================= */
+
 const app = initializeApp(firebaseConfig);
+
 const db = getDatabase(app);
+
 const auth = getAuth(app);
 
+
+/* =========================================
+   PAGE ELEMENTS
+========================================= */
+
 const form = document.getElementById("wishForm");
+
 const wish = document.getElementById("wish");
+
 const count = document.getElementById("count");
+
 const status = document.getElementById("status");
 
+const button = form.querySelector(".send");
+
+
+/* =========================================
+   CHARACTER COUNTER
+========================================= */
+
 wish.addEventListener("input", () => {
+
     count.textContent = wish.value.length;
+
 });
 
-function showStatus(text, error=false){
+
+/* =========================================
+   STATUS MESSAGE
+========================================= */
+
+function showStatus(text, error = false){
+
     status.textContent = text;
-    status.className = "status show" + (error ? " error" : "");
+
+    status.className =
+        "status show" +
+        (error ? " error" : "");
+
 }
 
+
+/* =========================================
+   SEND BIRTHDAY WISH
+========================================= */
+
 form.addEventListener("submit", async (e) => {
+
     e.preventDefault();
 
+
     const message = wish.value.trim();
-    if (!message) {
-        showStatus("Please write your birthday wish first.", true);
+
+
+    if(!message){
+
+        showStatus(
+            "Please write your birthday wish first.",
+            true
+        );
+
         return;
+
     }
 
-    const button = form.querySelector(".send");
+
     button.disabled = true;
+
     button.textContent = "SENDING...";
 
-    try {
-        if (!auth.currentUser) {
+
+    try{
+
+        /*
+         * Make sure anonymous authentication
+         * is active before writing to Firebase.
+         */
+
+        if(!auth.currentUser){
+
             await signInAnonymously(auth);
+
         }
 
-        await push(ref(db, "birthdayWishes"), {
+
+        /*
+         * Save the birthday wish
+         * inside:
+         *
+         * birthdayWishes
+         */
+
+        const wishesRef = ref(
+            db,
+            "birthdayWishes"
+        );
+
+
+        await push(wishesRef, {
+
             message: message,
+
             createdAt: serverTimestamp(),
+
             status: "new"
+
         });
 
+
+        /*
+         * Clear form after successful send.
+         */
+
         form.reset();
+
         count.textContent = "0";
-        showStatus("🎉 Your birthday wish has been sent successfully!");
-    } catch (error) {
-        console.error(error);
-        showStatus("We could not send your wish. Please try again.", true);
-    } finally {
+
+
+        showStatus(
+            "🎉 Your birthday wish has been sent successfully!"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Birthday wish error:",
+            error
+        );
+
+
+        /*
+         * Show the real Firebase error
+         * in the browser console.
+         */
+
+        showStatus(
+            "We could not send your wish. Please try again.",
+            true
+        );
+
+    }finally{
+
         button.disabled = false;
-        button.textContent = "✈️   SEND BIRTHDAY WISH";
+
+        button.textContent =
+            "✈️   SEND BIRTHDAY WISH";
+
     }
+
 });
+
 </script>
+
 </body>
 </html>

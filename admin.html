@@ -6,9 +6,12 @@
 <title>Kulzzy Radio - Birthday Wishes Admin</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
-html,body{
+html,
+body{
     margin:0;
     padding:0;
     min-height:100%;
@@ -43,9 +46,10 @@ body{
     text-transform:uppercase;
 }
 
-.title span{color:#ffbf16}
+.title span{
+    color:#ffbf16;
+}
 
-.login-card,
 .panel{
     width:100%;
     max-width:900px;
@@ -54,50 +58,7 @@ body{
     border:2px solid #ffbf16;
     border-radius:18px;
     box-shadow:0 12px 30px rgba(0,0,0,.35);
-}
-
-.login-card{
-    max-width:520px;
-    padding:28px;
-}
-
-.panel{
-    display:none;
     overflow:hidden;
-}
-
-label{
-    display:block;
-    margin:0 0 8px;
-    color:#ffbf16;
-    font-weight:800;
-}
-
-input{
-    width:100%;
-    padding:14px 15px;
-    margin-bottom:16px;
-    border:1px solid #ffbf16;
-    border-radius:10px;
-    outline:none;
-    background:#fff;
-    color:#111;
-    font-size:16px;
-}
-
-button{
-    border:0;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:900;
-}
-
-.login-btn{
-    width:100%;
-    padding:15px;
-    background:#ffbf16;
-    color:#07152f;
-    font-size:17px;
 }
 
 .topbar{
@@ -115,11 +76,10 @@ button{
     font-size:24px;
 }
 
-.logout{
-    padding:10px 16px;
-    background:#07152f;
-    border:1px solid #ffbf16;
-    color:#ffbf16;
+.count{
+    color:#dfe5ef;
+    font-size:14px;
+    margin-top:4px;
 }
 
 .messages{
@@ -162,7 +122,7 @@ button{
 }
 
 .status{
-    margin-top:14px;
+    margin:18px;
     padding:12px 14px;
     border-radius:10px;
     text-align:center;
@@ -183,212 +143,388 @@ button{
     border-color:#ff6575;
 }
 
-.count{
-    color:#dfe5ef;
-    font-size:14px;
-}
-
 @media(max-width:650px){
-    body{padding:20px 9px 35px}
 
-    .login-card{padding:20px}
+    body{
+        padding:20px 9px 35px;
+    }
 
     .topbar{
         align-items:flex-start;
         flex-direction:column;
     }
 
-    .topbar h2{font-size:21px}
+    .topbar h2{
+        font-size:21px;
+    }
 
     .message-top{
         flex-direction:column;
         gap:5px;
+    }
+
+    .message-text{
+        font-size:17px;
     }
 }
 </style>
 </head>
 
 <body>
+
 <div class="page">
 
     <div class="header">
-        <h1 class="title">BIRTHDAY <span>WISHES</span></h1>
-    </div>
-
-    <div id="loginCard" class="login-card">
-        <label for="email">Admin Email</label>
-        <input id="email" type="email" autocomplete="username" placeholder="Enter admin email">
-
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" placeholder="Enter password">
-
-        <button id="loginBtn" class="login-btn" type="button">LOGIN TO VIEW WISHES</button>
-
-        <div id="loginStatus" class="status"></div>
+        <h1 class="title">
+            BIRTHDAY <span>WISHES</span>
+        </h1>
     </div>
 
     <div id="panel" class="panel">
+
         <div class="topbar">
+
             <div>
                 <h2>Birthday Wishes</h2>
-                <div id="count" class="count">0 wishes</div>
+                <div id="count" class="count">
+                    Loading...
+                </div>
             </div>
-            <button id="logoutBtn" class="logout" type="button">LOGOUT</button>
+
         </div>
 
         <div id="messages" class="messages">
-            <div class="empty">Loading birthday wishes...</div>
+
+            <div class="empty">
+                Loading birthday wishes...
+            </div>
+
         </div>
+
+        <div id="status" class="status"></div>
+
     </div>
 
 </div>
 
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+
 import {
     getDatabase,
     ref,
     onValue
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+/* =========================================================
+   FIREBASE CONFIGURATION
+   ========================================================= */
 
 const firebaseConfig = {
+
     apiKey: "PASTE_API_KEY",
+
     authDomain: "PASTE_PROJECT.firebaseapp.com",
-    databaseURL: "https://PASTE_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "PASTE_PROJECT_ID",
-    storageBucket: "PASTE_PROJECT.firebasestorage.app",
-    messagingSenderId: "PASTE_SENDER_ID",
-    appId: "PASTE_APP_ID"
+
+    databaseURL:
+        "https://PASTE_PROJECT-default-rtdb.firebaseio.com",
+
+    projectId:
+        "PASTE_PROJECT_ID",
+
+    storageBucket:
+        "PASTE_PROJECT.firebasestorage.app",
+
+    messagingSenderId:
+        "PASTE_SENDER_ID",
+
+    appId:
+        "PASTE_APP_ID"
+
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
 
-const loginCard = document.getElementById("loginCard");
-const panel = document.getElementById("panel");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const loginStatus = document.getElementById("loginStatus");
-const messages = document.getElementById("messages");
-const count = document.getElementById("count");
 
-function showLoginStatus(text, error=false) {
-    loginStatus.textContent = text;
-    loginStatus.className = "status show" + (error ? " error" : "");
+/* =========================================================
+   INITIALIZE FIREBASE
+   ========================================================= */
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getDatabase(app);
+
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const messages =
+    document.getElementById("messages");
+
+const count =
+    document.getElementById("count");
+
+const status =
+    document.getElementById("status");
+
+
+
+/* =========================================================
+   STATUS MESSAGE
+   ========================================================= */
+
+function showStatus(text, error = false){
+
+    status.textContent = text;
+
+    status.className =
+        "status show" +
+        (error ? " error" : "");
+
 }
 
-loginBtn.addEventListener("click", async () => {
-    const userEmail = email.value.trim();
-    const userPassword = password.value;
 
-    if (!userEmail || !userPassword) {
-        showLoginStatus("Enter your admin email and password.", true);
-        return;
-    }
 
-    loginBtn.disabled = true;
-    loginBtn.textContent = "LOGGING IN...";
+/* =========================================================
+   LISTEN FOR BIRTHDAY WISHES
+   ========================================================= */
 
-    try {
-        await signInWithEmailAndPassword(auth, userEmail, userPassword);
-        loginStatus.className = "status";
-    } catch (error) {
-        console.error(error);
-        showLoginStatus("Login failed. Check your email and password.", true);
-    } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "LOGIN TO VIEW WISHES";
-    }
-});
+function listenForWishes(){
 
-logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-});
+    const wishesRef =
+        ref(db, "birthdayWishes");
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        loginCard.style.display = "none";
-        panel.style.display = "block";
-        listenForWishes();
-    } else {
-        loginCard.style.display = "block";
-        panel.style.display = "none";
-        messages.innerHTML = '<div class="empty">Login to view birthday wishes.</div>';
-        count.textContent = "0 wishes";
-    }
-});
 
-function listenForWishes() {
-    const wishesRef = ref(db, "birthdayWishes");
+    onValue(
 
-    onValue(wishesRef, (snapshot) => {
-        const data = snapshot.val();
+        wishesRef,
 
-        if (!data) {
-            messages.innerHTML = '<div class="empty">No birthday wishes have been received yet.</div>';
-            count.textContent = "0 wishes";
-            return;
+        (snapshot) => {
+
+            const data =
+                snapshot.val();
+
+
+            /*
+             * No wishes
+             */
+
+            if(!data){
+
+                messages.innerHTML =
+                    '<div class="empty">' +
+                    'No birthday wishes have been received yet.' +
+                    '</div>';
+
+                count.textContent =
+                    "0 wishes";
+
+                status.className =
+                    "status";
+
+                return;
+            }
+
+
+
+            /*
+             * Convert Firebase data
+             * into an array
+             */
+
+            const wishes =
+                Object.entries(data)
+
+                .map(
+                    ([id, wish]) => ({
+                        id,
+                        ...wish
+                    })
+                )
+
+                .sort(
+                    (a,b) =>
+                        (Number(b.createdAt) || 0) -
+                        (Number(a.createdAt) || 0)
+                );
+
+
+
+            /*
+             * Update counter
+             */
+
+            count.textContent =
+                `${wishes.length} ${
+                    wishes.length === 1
+                    ? "wish"
+                    : "wishes"
+                }`;
+
+
+
+            /*
+             * Clear old messages
+             */
+
+            messages.innerHTML = "";
+
+
+
+            /*
+             * Display wishes
+             */
+
+            wishes.forEach((wish) => {
+
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "message";
+
+
+
+                const top =
+                    document.createElement("div");
+
+                top.className =
+                    "message-top";
+
+
+
+                const sender =
+                    document.createElement("strong");
+
+                sender.textContent =
+                    "ANONYMOUS";
+
+
+
+                const date =
+                    document.createElement("span");
+
+                date.textContent =
+                    formatDate(wish.createdAt);
+
+
+
+                top.appendChild(sender);
+
+                top.appendChild(date);
+
+
+
+                const text =
+                    document.createElement("div");
+
+                text.className =
+                    "message-text";
+
+                text.textContent =
+                    wish.message || "";
+
+
+
+                item.appendChild(top);
+
+                item.appendChild(text);
+
+                messages.appendChild(item);
+
+            });
+
+
+
+            status.className =
+                "status";
+
+        },
+
+
+
+        (error) => {
+
+            console.error(
+                "Firebase Database Error:",
+                error
+            );
+
+
+            messages.innerHTML =
+                '<div class="empty">' +
+                'Unable to read the birthday wishes. ' +
+                'Check your Firebase Realtime Database rules.' +
+                '</div>';
+
+
+            count.textContent =
+                "Unable to load";
+
+
+            showStatus(
+                "Firebase could not load the birthday wishes.",
+                true
+            );
+
         }
 
-        const wishes = Object.entries(data)
-            .map(([id, wish]) => ({ id, ...wish }))
-            .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0));
+    );
 
-        count.textContent = `${wishes.length} ${wishes.length === 1 ? "wish" : "wishes"}`;
-
-        messages.innerHTML = "";
-
-        wishes.forEach((wish) => {
-            const item = document.createElement("div");
-            item.className = "message";
-
-            const top = document.createElement("div");
-            top.className = "message-top";
-
-            const sender = document.createElement("strong");
-            sender.textContent = "ANONYMOUS";
-
-            const date = document.createElement("span");
-            date.textContent = formatDate(wish.createdAt);
-
-            top.appendChild(sender);
-            top.appendChild(date);
-
-            const text = document.createElement("div");
-            text.className = "message-text";
-            text.textContent = wish.message || "";
-
-            item.appendChild(top);
-            item.appendChild(text);
-            messages.appendChild(item);
-        });
-    }, (error) => {
-        console.error(error);
-        messages.innerHTML = '<div class="empty">Unable to read the birthday wishes. Check your Firebase database rules.</div>';
-    });
 }
 
-function formatDate(timestamp) {
-    if (!timestamp) return "Date unavailable";
 
-    const date = new Date(Number(timestamp));
 
-    if (Number.isNaN(date.getTime())) {
+/* =========================================================
+   FORMAT DATE
+   ========================================================= */
+
+function formatDate(timestamp){
+
+    if(!timestamp){
+
         return "Date unavailable";
+
     }
 
+
+    const date =
+        new Date(Number(timestamp));
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return "Date unavailable";
+
+    }
+
+
     return date.toLocaleString();
+
 }
+
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+listenForWishes();
+
 </script>
 
 </body>
